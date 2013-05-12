@@ -18,25 +18,56 @@ class Agent {
 	friend class Market;
 
 public:
-	Agent(Market *a_market, AgentType a_type = DEFAULT, int a_favouriteStockId = 1);
+	Agent(Market *a_market,
+	      AgentType a_type = DEFAULT,
+	      int a_favouriteStockId = 1);
+
 	virtual ~Agent();
-	void notifyExecution(int a_orderIdentifier, double a_time, int a_price);
-	void notifyPartialExecution(int a_orderIdentifier, double a_time, int a_volume, int a_price);
-	void notifyCancellation(int a_orderIdentifier, double a_time);
-	virtual void processCashPosition(double a_time, int a_volume, int a_price, const OrderType &a_type);
-	void setIdentifier(int a_identifier) ;
+
+	void notifyExecution(int a_orderIdentifier,
+			     double a_time,
+			     int a_price);
+	
+	void notifyPartialExecution(int a_orderIdentifier,
+				    double a_time,
+				    int a_volume,
+				    int a_price);
+
+	void notifyCancellation(int a_orderIdentifier,
+				double a_time);
+
+	virtual void processCashPosition(double a_time,
+					 int a_volume,
+					 int a_price,
+					 const OrderType& a_type);
+
+	void setIdentifier(int a_identifier);
+
 	AgentType getAgentType() const;
+
 	virtual double getNextActionTime() const = 0;
-	virtual void makeAction(int a_OrderBookId, double currentTime) = 0;
+
+	virtual void makeAction(int a_OrderBookId,
+				double currentTime) = 0;
+
 	virtual void processInformation() = 0;
+
 	void notifyAgentOfMarketEvent();
+
 	void initAssetQuantity(int a_stockIdentifier);
+
 	int getStockQuantity(int a_stockIdentifier);
+
 	int getFavouriteStock();
+
 	virtual int getTargetedStock();
+
 	virtual double getFeeRate(OrderType a_orderType);
+
 	void chargeMarketFees(double a_fee);
+
 	double getNetCashPosition();
+
 	std::map<int,Order>* getPendingOrders();
 
 protected:
@@ -60,6 +91,5 @@ protected:
 	void submitCancellation(int a_OrderBookId,int a_orderIdentifier, double a_time);
 
 };
-
 
 #endif /* AGENT_H_ */
