@@ -21,7 +21,7 @@ LINK := clang++
 EXECUTABLE := hftsim
 SRC := Exceptions.cpp Order.cpp OrderBook.cpp Agent.cpp \
 	   NewsServer.cpp Market.cpp LiquidityProvider.cpp \
-	   NoiseTrader.cpp MarketMaker.cpp Plot.cpp Stats.cpp Simulator.cpp
+	   NoiseTrader.cpp MarketMaker.cpp Plot.cpp Stats.cpp main.cpp
 OBJS := $(SRC:.cpp=.o)
 LOBJS := $(patsubst %.o,$(OBJDIR)/%.o,$(OBJS))
 
@@ -36,7 +36,7 @@ LINKLINE := $(LINK) -o $(TARGET) $(LOBJS)
 	$(CC) $(CFLAGS) -o $(OBJDIR)/$@ -c $< $(BOOST_INC)
 
 # user targets
-all: clean arch-cible $(TARGET)
+all: arch-cible $(TARGET)
 	@echo "Finished OK"
 
 arch-cible:

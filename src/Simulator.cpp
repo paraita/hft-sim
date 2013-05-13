@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
 	// Create one Liquidity Provider
 	DistributionExponential *LimitOrderActionTimeDistribution = new DistributionExponential(myRNG, meanActionTimeLP);
 	DistributionGaussian *LimitOrderOrderVolumeDistribution = new DistributionGaussian(myRNG, 0.7*100, sqrt(0.2 * 100));
-	DistributionExponential *LimitOrderOrderPriceDistribution = new DistributionExponential(myRNG, meanPriceLagLP) ;
+	DistributionExponential *LimitOrderOrderPriceDistribution = new DistributionExponential(myRNG, meanPriceLagLP);
 	LiquidityProvider *myLiquidityProvider = new LiquidityProvider(myMarket,
 			LimitOrderActionTimeDistribution,
 			LimitOrderOrderVolumeDistribution,
