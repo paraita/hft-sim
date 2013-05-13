@@ -63,37 +63,37 @@ class OrderBook {
 
  private:
 
-  int m_identifier;
-  Market * m_linkToMarket; // DO NOT DELETE, JUST A LINK
-  int m_tickSize ;
-  int m_defaultBid;
-  int m_defaultAsk;
-  int m_last;
-  int m_lastQ;
+  int identifier;
+  Market * linkToMarket; // DO NOT DELETE, JUST A LINK
+  int tickSize ;
+  int defaultBid;
+  int defaultAsk;
+  int last;
+  int lastQ;
 
   // We need sometimes to iterate on the elements.
   // And while canceling, we can cancel an order situated in the middle of the container
   // hence the choice of a list
   // But Only queue-type operations of lists will be used when pushing (push_back), and executing(pop_front)
-  std::map<int, std::list<Order> > m_bids;
-  std::map<int, std::list<Order> > m_asks;
+  std::map<int, std::list<Order> > bids;
+  std::map<int, std::list<Order> > asks;
 
   // Parameters for keeping history of orders
-  std::vector<OrderBookHistory> m_orderBookHistory;
-  std::vector<Order> m_orderHistory;
-  bool m_storeOrderBookHistory;
-  bool m_storeOrderHistory ;
-  bool m_printHistoryonTheFly;
-  int m_maxDepth;
-  bool m_headerPrinted;
+  std::vector<OrderBookHistory> orderBookHistory;
+  std::vector<Order> orderHistory;
+  bool b_storeOrderBookHistory;
+  bool storeOrderHistory ;
+  bool printHistoryonTheFly;
+  int maxDepth;
+  bool headerPrinted;
 
   //contains the prices of the asset
-  std::vector<int> m_historicPrices;
+  std::vector<int> historicPrices;
 
   //contains the times of transactions (Market orders)
-  std::vector<double> m_transactionsTimes;
+  std::vector<double> transactionsTimes;
 
-  double m_returnsSumSquared;
+  double returnsSumSquared;
 
 };
 

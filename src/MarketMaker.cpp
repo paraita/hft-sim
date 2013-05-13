@@ -42,11 +42,11 @@ int MarketMaker::getOrderVolume() const {
 
 int MarketMaker::getOrderVolume(double price, int a_OrderBookId, OrderType orderType) const {
   if (orderType == LIMIT_BUY) {
-    int volumeBid = m_linkToMarket->getOrderBook(a_OrderBookId)->getBidQuantity();
+    int volumeBid = linkToMarket->getOrderBook(a_OrderBookId)->getBidQuantity();
     return std::max(int(m_VolumeProportion * volumeBid),5);		
   }
   else {
-    int volumeAsk = m_linkToMarket->getOrderBook(a_OrderBookId)->getAskQuantity();
+    int volumeAsk = linkToMarket->getOrderBook(a_OrderBookId)->getAskQuantity();
     return std::max(int(m_VolumeProportion * volumeAsk),5);
   }			
 }
@@ -54,15 +54,15 @@ int MarketMaker::getOrderVolume(double price, int a_OrderBookId, OrderType order
 int MarketMaker::getOrderPrice(int a_OrderBookId, OrderType a_OrderType) const {
   int price;
   double lag = m_OrderPriceDistribution->nextRandom();
-  int tickSize = m_linkToMarket->getOrderBook(a_OrderBookId)->getTickSize();
+  int tickSize = linkToMarket->getOrderBook(a_OrderBookId)->getTickSize();
   //int spread = m_linkToMarket->getOrderBook(a_OrderBookId)->getAskPrice() - m_linkToMarket->getOrderBook(a_OrderBookId)->getBidPrice();
   //if(spread >= 2 *  m_linkToMarket->getOrderBook(a_OrderBookId)->getTickSize()){
   if(a_OrderType == LIMIT_BUY) {
-    int currentPrice = m_linkToMarket->getOrderBook(a_OrderBookId)->getBidPrice();
+    int currentPrice = linkToMarket->getOrderBook(a_OrderBookId)->getBidPrice();
     price = currentPrice + tickSize;
   }
   else if(a_OrderType == LIMIT_SELL) {
-    int currentPrice = m_linkToMarket->getOrderBook(a_OrderBookId)->getAskPrice();
+    int currentPrice = linkToMarket->getOrderBook(a_OrderBookId)->getAskPrice();
     price = currentPrice - tickSize;
   }
   else {
@@ -113,14 +113,14 @@ void MarketMaker::makeAction(int a_OrderBookId, double a_currentTime) {
     }
     return;
   }
-  int spread = m_linkToMarket->getOrderBook(a_OrderBookId)->getAskPrice() - m_linkToMarket->getOrderBook(a_OrderBookId)->getBidPrice();
+  int spread = linkToMarket->getOrderBook(a_OrderBookId)->getAskPrice() - linkToMarket->getOrderBook(a_OrderBookId)->getBidPrice();
 		
-  if(spread < (2 *  m_linkToMarket->getOrderBook(a_OrderBookId)->getTickSize())) return;
+  if(spread < (2 *  linkToMarket->getOrderBook(a_OrderBookId)->getTickSize())) return;
 
-  if(spread >= (2 *  m_linkToMarket->getOrderBook(a_OrderBookId)->getTickSize())) {
+  if(spread >= (2 *  linkToMarket->getOrderBook(a_OrderBookId)->getTickSize())) {
     int thisOrderPrice = getOrderPrice(a_OrderBookId, thisOrderType);
     int thisOrderVolume = getOrderVolume(thisOrderPrice, a_OrderBookId, thisOrderType);
-    int tickSize = m_linkToMarket->getOrderBook(a_OrderBookId)->getTickSize();
+    int tickSize = linkToMarket->getOrderBook(a_OrderBookId)->getTickSize();
     submitOrder(a_OrderBookId,
 		a_currentTime,
 		thisOrderVolume,
@@ -146,7 +146,7 @@ void MarketMaker::makeAction(int a_OrderBookId, double a_currentTime) {
 }
 
 void MarketMaker::chooseOrdersToBeCanceled(int a_OrderBookId, bool a_buySide, double a_time) {
-  std::map<int,Order> pendingOrdersCopy(m_pendingOrders);
+  std::map<int,Order> pendingOrdersCopy(pendingOrders);
   std::map<int,Order>::iterator iter = pendingOrdersCopy.begin();
 
   while(iter != pendingOrdersCopy.end()) {
@@ -166,5 +166,5 @@ void MarketMaker::processInformation() {
 }
 
 void MarketMaker::cleanPending() {
-  m_pendingOrders.clear();
+  pendingOrders.clear();
 }

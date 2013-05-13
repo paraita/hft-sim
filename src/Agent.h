@@ -9,6 +9,7 @@
 #define AGENT_H_
 
 #include <map>
+#include "Types.h"
 
 class Order;
 class Market;
@@ -71,16 +72,16 @@ public:
 	std::map<int,Order>* getPendingOrders();
 
 protected:
-	int	m_identifier;
-	AgentType m_Type;
-	Market *m_linkToMarket;
-	std::map<int,Order> m_passedOrders;
-	std::map<int,Order> m_pendingOrders;
-	int m_cashPosition;
-	std::vector<std::pair<double,int> > m_cashPositionHistory;
-	std::map<int,int> m_stockQuantity;
-	int m_favouriteStockId;
-	double m_fees;
+	int	identifier;
+	AgentType type;
+	Market *linkToMarket;
+	std::map<int,Order> passedOrders;
+	std::map<int,Order> pendingOrders;
+	int cashPosition;
+	std::vector<std::pair<double,int> > cashPositionHistory;
+	std::map<int,int> stockQuantity;
+	int favouriteStockId;
+	double fees;
 
 	void updateStockNumber(Order *a_order,int a_executedVolume);
 	bool isMine(Order a_order) const;

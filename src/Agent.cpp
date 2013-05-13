@@ -6,25 +6,26 @@
 #include "OrderBook.h"
 
 Agent::Agent(Market *a_market, AgentType a_Type, int a_favouriteStockId) {
-  m_linkToMarket = a_market;
-  m_Type = a_Type;
-  m_cashPosition = 0;
-  m_favouriteStockId = a_favouriteStockId;
-  m_fees = 0.0;
+  linkToMarket = a_market;
+  type = a_Type;
+  cashPosition = 0;
+  favouriteStockId = a_favouriteStockId;
+  fees = 0.0;
+  identifier = 0;
 }
 
 Agent::~Agent() { }
 
 int Agent::getFavouriteStock() {
-  return m_favouriteStockId;
+  return favouriteStockId;
 }
 
 AgentType Agent::getAgentType() const { 
-  return m_Type;
+  return type;
 }
 
 void Agent::setIdentifier(int a_identifier) {
-  m_identifier = a_identifier;
+  identifier = a_identifier;
 }
 
 void Agent::submitOrder(int a_asset,
@@ -33,74 +34,73 @@ void Agent::submitOrder(int a_asset,
 			OrderType a_type,
 			int a_price) {
   if(a_volume != 0) {
-    int l_orderIdentifier = m_linkToMarket->getOrderIdentifier();
+    int l_orderIdentifier = linkToMarket->getOrderIdentifier();
     Order l_order(a_asset,
-		  m_identifier,
+		  identifier,
 		  a_time,
 		  a_price,
 		  a_volume,
 		  a_type,
 		  l_orderIdentifier);
-    m_passedOrders[l_orderIdentifier] = l_order;
-    m_pendingOrders[l_orderIdentifier] = l_order;
-    m_linkToMarket->pushOrder(l_order);
+    passedOrders[l_orderIdentifier] = l_order;
+    pendingOrders[l_orderIdentifier] = l_order;
+    linkToMarket->pushOrder(l_order);
   }
 }
 
 void Agent::submitCancellation(int a_OrderBookId, int a_orderIdentifier, double a_time) {
-  m_linkToMarket->getOrderBook(a_OrderBookId)->processCancellation(m_identifier, a_orderIdentifier, a_time);
+  linkToMarket->getOrderBook(a_OrderBookId)->processCancellation(identifier, a_orderIdentifier, a_time);
 }
 void Agent::notifyExecution(int a_orderIdentifier,
 			    double a_time,
 			    int a_price) {
-  Order *l_order = &m_passedOrders[a_orderIdentifier];
-  l_order->m_state = EXECUTED;
+  Order *l_order = &passedOrders[a_orderIdentifier];
+  l_order->setState(EXECUTED);
 	
   // Remove from pending orders list
-  std::map<int,Order>::iterator iter = m_pendingOrders.find(a_orderIdentifier) ;
-  if(iter == m_pendingOrders.end()){
-    std::cout << "a_orderIdentifier not found in Agent::notifyExecution." << std::endl ;
+  std::map<int, Order>::iterator iter = pendingOrders.find(a_orderIdentifier) ;
+  if(iter == pendingOrders.end()){
+    std::cout << "a_orderIdentifier not found in Agent::notifyExecution." << std::endl;
     exit(1);
   }
-  m_pendingOrders.erase(iter);
+  pendingOrders.erase(iter);
 
-  l_order->m_executionHistory.push_back(ExecutionHistory(a_time, l_order->m_volume, a_price));
-  updateStockNumber(l_order, l_order->m_volume);
-  processCashPosition(a_time, l_order->m_volume, a_price, l_order->m_type);
-  l_order->m_volume = 0;
+  l_order->executionHistory.push_back(ExecutionHistory(a_time, l_order->volume, a_price));
+  updateStockNumber(l_order, l_order->volume);
+  processCashPosition(a_time, l_order->volume, a_price, l_order->type);
+  l_order->volume = 0;
 }
 
 void Agent::notifyPartialExecution(int a_orderIdentifier, double a_time, int a_volume, int a_price) {
-  Order *l_order = &m_passedOrders[a_orderIdentifier];
-  l_order->m_state = PARTIALLY_EXECUTED;
+  Order *l_order = &passedOrders[a_orderIdentifier];
+  l_order->setState(PARTIALLY_EXECUTED);
 	
-  l_order->m_executionHistory.push_back(ExecutionHistory(a_time,a_volume,a_price));
-  l_order->m_volume -= a_volume;
+  l_order->executionHistory.push_back(ExecutionHistory(a_time,a_volume,a_price));
+  l_order->setVolume(l_order->getVolume() - a_volume);
 	
   updateStockNumber(l_order,a_volume);
-  processCashPosition(a_time,a_volume,a_price,l_order->m_type);
+  processCashPosition(a_time, a_volume, a_price, l_order->type);
 }
 
 void Agent::notifyCancellation(int a_orderIdentifier, double a_time) {
-  Order *l_order = &m_passedOrders[a_orderIdentifier];
-  l_order->m_state = CANCELED;
+  Order *l_order = &passedOrders[a_orderIdentifier];
+  l_order->state = CANCELED;
 
   // Remove from pending orders list
-  std::map<int,Order>::iterator iter = m_pendingOrders.find(a_orderIdentifier) ;
-  if(iter == m_pendingOrders.end()){
+  std::map<int, Order>::iterator iter = pendingOrders.find(a_orderIdentifier) ;
+  if(iter == pendingOrders.end()){
     std::cout << "a_orderIdentifier not found in Agent::notifyCancellation." << std::endl ;
     exit(1);
   }
-  m_pendingOrders.erase(iter) ;
+  pendingOrders.erase(iter) ;
 	
-  l_order->m_executionHistory.push_back(ExecutionHistory(a_time, -1, -1));
+  l_order->executionHistory.push_back(ExecutionHistory(a_time, -1, -1));
 }
 
-void Agent::processCashPosition(double a_time, int a_volume, int a_price, const OrderType &a_type) {
-  int l_cashFlow = a_volume*a_price;
+void Agent::processCashPosition(double a_time, int a_volume, int a_price, const OrderType& a_type) {
+  int l_cashFlow = a_volume * a_price;
   int l_type;
-  switch (a_type)
-    {
+  switch (a_type) {
     case LIMIT_SELL:
     case MARKET_SELL:
       l_type = 1;
@@ -113,31 +113,32 @@ void Agent::processCashPosition(double a_time, int a_volume, int a_price, const 
       break;
     }
 	
-  m_cashPosition += (l_type*l_cashFlow);
-  m_cashPositionHistory.push_back(std::make_pair(a_time,m_cashPosition));
+  cashPosition += (l_type * l_cashFlow);
+  cashPositionHistory.push_back(std::make_pair(a_time, cashPosition));
 }
-void Agent::notifyAgentOfMarketEvent()
-{
+
+void Agent::notifyAgentOfMarketEvent() {
   processInformation();
 }
-void Agent::initAssetQuantity(int a_stockIdentifier)
-{
-  m_stockQuantity[a_stockIdentifier] = 0;
-}	
-int Agent::getStockQuantity(int a_stockIdentifier)
-{
-  return m_stockQuantity[a_stockIdentifier];
+
+void Agent::initAssetQuantity(int a_stockIdentifier) {
+  stockQuantity[a_stockIdentifier] = 0;
 }
+
+int Agent::getStockQuantity(int a_stockIdentifier) {
+  return stockQuantity[a_stockIdentifier];
+}
+
 void Agent::updateStockNumber(Order *a_order,int a_executedVolume) {
-  switch(a_order->m_type)
+  switch(a_order->type)
     {
     case LIMIT_SELL:
     case MARKET_SELL:
-      m_stockQuantity[a_order->m_asset] -= a_executedVolume;
+      stockQuantity[a_order->asset] -= a_executedVolume;
       break;
     case LIMIT_BUY:
     case MARKET_BUY:
-      m_stockQuantity[a_order->m_asset] += a_executedVolume;
+      stockQuantity[a_order->asset] += a_executedVolume;
       break;
     default:// Nothing to do with other order types
       break;
@@ -146,7 +147,7 @@ void Agent::updateStockNumber(Order *a_order,int a_executedVolume) {
 
 bool Agent::isMine(Order a_order) const {
   bool l_mine = false;
-  if (a_order.m_owner == m_identifier)
+  if (a_order.owner == identifier)
     {
       l_mine = true;
     }
@@ -154,11 +155,11 @@ bool Agent::isMine(Order a_order) const {
 }
 
 void Agent::chargeMarketFees(double a_fee) {
-  m_fees += a_fee;
+  fees += a_fee;
 }
 
 double Agent::getNetCashPosition() {
-  return (m_cashPosition-m_fees);
+  return (cashPosition - fees);
 }
 
 int Agent::getTargetedStock() {
@@ -170,6 +171,6 @@ double Agent::getFeeRate(OrderType a_orderType) {
 }
 
 std::map<int,Order> * Agent::getPendingOrders() {
-  return &m_pendingOrders;
+  return &pendingOrders;
 }
 

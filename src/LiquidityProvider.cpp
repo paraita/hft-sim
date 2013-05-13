@@ -17,41 +17,41 @@ LiquidityProvider::LiquidityProvider(Market *a_market,
 				     double a_cancelBuyFrequency,
 				     double a_cancelSellFrequency,
 				     double a_cancelProbability) : Agent(a_market,LIQUIDITY_PROVIDER, a_favouriteStockIdentifier) {
-  m_ActionTimeDistribution = a_ActionTimeDistribution;
-  m_OrderVolumeDistribution = a_OrderVolumeDistribution;
-  m_OrderPriceDistribution = a_OrderPriceDistribution;
-  m_buyFrequency = a_buyFrequency;
-  m_OrderTypeDistribution = new DistributionUniform(a_market->getRNG());
-  m_cancelBuyFrequency = a_cancelBuyFrequency;
-  m_cancelSellFrequency = a_cancelSellFrequency;
-  m_sellFrequency = 1.0 - m_cancelBuyFrequency - m_cancelSellFrequency - m_buyFrequency;
-  m_cancelProbability = a_cancelProbability;
-  m_cancelDistribution = new DistributionUniform(a_market->getRNG());
+  actionTimeDistribution = a_ActionTimeDistribution;
+  orderVolumeDistribution = a_OrderVolumeDistribution;
+  orderPriceDistribution = a_OrderPriceDistribution;
+  buyFrequency = a_buyFrequency;
+  orderTypeDistribution = new DistributionUniform(a_market->getRNG());
+  cancelBuyFrequency = a_cancelBuyFrequency;
+  cancelSellFrequency = a_cancelSellFrequency;
+  sellFrequency = 1.0 - cancelBuyFrequency - cancelSellFrequency - buyFrequency;
+  cancelProbability = a_cancelProbability;
+  cancelDistribution = new DistributionUniform(a_market->getRNG());
 }
 
 LiquidityProvider::~LiquidityProvider() { }
 
 double LiquidityProvider::getNextActionTime() const {
-  return m_ActionTimeDistribution->nextRandom() ;
+  return actionTimeDistribution->nextRandom() ;
 }
 
 int LiquidityProvider::getOrderVolume() const {
-  return std::max((int)m_OrderVolumeDistribution->nextRandom(), 1) ;		
+  return std::max((int) orderVolumeDistribution->nextRandom(), 1) ;
 }
 
 int LiquidityProvider::getOrderVolume(double price, int a_OrderBookId, OrderType orderType) const {
   int slotMax = 20;
   if (orderType == LIMIT_BUY){
-    int currentPriceAsk = m_linkToMarket->getOrderBook(a_OrderBookId)->getAskPrice();
+    int currentPriceAsk = linkToMarket->getOrderBook(a_OrderBookId)->getAskPrice();
 
     if (price < currentPriceAsk && price>(currentPriceAsk - 0.25 * slotMax)) {
-      int volume = std::min((int)m_OrderVolumeDistribution->nextRandom(), 100);
+      int volume = std::min((int) orderVolumeDistribution->nextRandom(), 100);
       return std::max(volume, 1);
     }
     else {
       int slotNumber;
-      slotNumber = (int) (currentPriceAsk- price) / (m_linkToMarket->getOrderBook(a_OrderBookId)->getTickSize());		
-      DistributionUniform *uniformVolumeDistribution = new DistributionUniform(m_linkToMarket->getRNG(),
+      slotNumber = (int) (currentPriceAsk- price) / (linkToMarket->getOrderBook(a_OrderBookId)->getTickSize());
+      DistributionUniform *uniformVolumeDistribution = new DistributionUniform(linkToMarket->getRNG(),
 									       0,
 									       (70 * 6) / (slotNumber^(3 / 2)));
       int volume = std::max((int) uniformVolumeDistribution->nextRandom(), 1);
@@ -60,16 +60,16 @@ int LiquidityProvider::getOrderVolume(double price, int a_OrderBookId, OrderType
     }
   }
   else {
-    int currentPriceBid = m_linkToMarket->getOrderBook(a_OrderBookId)->getBidPrice() ;
+    int currentPriceBid = linkToMarket->getOrderBook(a_OrderBookId)->getBidPrice() ;
 
     if (price > currentPriceBid && price<(currentPriceBid + 0.25 * slotMax)) {
-      int volume = std::min((int)m_OrderVolumeDistribution->nextRandom(), 100);
+      int volume = std::min((int) orderVolumeDistribution->nextRandom(), 100);
       return std::max(volume, 1);
     }
     else {
       int slotNumber;
-      slotNumber = (int) (price-currentPriceBid) / (m_linkToMarket->getOrderBook(a_OrderBookId)->getTickSize());		
-      DistributionUniform *uniformVolumeDistribution = new DistributionUniform(m_linkToMarket->getRNG(),
+      slotNumber = (int) (price-currentPriceBid) / (linkToMarket->getOrderBook(a_OrderBookId)->getTickSize());
+      DistributionUniform *uniformVolumeDistribution = new DistributionUniform(linkToMarket->getRNG(),
 									       0,
 									       (70 * 6) / (slotNumber^(3 / 2)));
       int volume = std::max((int)uniformVolumeDistribution->nextRandom(), 1);
@@ -81,14 +81,14 @@ int LiquidityProvider::getOrderVolume(double price, int a_OrderBookId, OrderType
 
 int LiquidityProvider::getOrderPrice(int a_OrderBookId, OrderType a_OrderType) const {
   int price;
-  double lag = m_OrderPriceDistribution->nextRandom();
-  int tickSize = m_linkToMarket->getOrderBook(a_OrderBookId)->getTickSize();
+  double lag = orderPriceDistribution->nextRandom();
+  int tickSize = linkToMarket->getOrderBook(a_OrderBookId)->getTickSize();
   if(a_OrderType == LIMIT_BUY) {
-    int currentPrice = m_linkToMarket->getOrderBook(a_OrderBookId)->getAskPrice();
+    int currentPrice = linkToMarket->getOrderBook(a_OrderBookId)->getAskPrice();
     price = currentPrice - (((int) lag) * tickSize) - tickSize;
   }
   else if(a_OrderType==LIMIT_SELL) {
-    int currentPrice = m_linkToMarket->getOrderBook(a_OrderBookId)->getBidPrice();
+    int currentPrice = linkToMarket->getOrderBook(a_OrderBookId)->getBidPrice();
     price = currentPrice + (((int) lag) * tickSize) + tickSize;
   }
   else {
@@ -98,21 +98,21 @@ int LiquidityProvider::getOrderPrice(int a_OrderBookId, OrderType a_OrderType) c
 }
 
 OrderType LiquidityProvider::getOrderType() const {
-  double l_orderTypeAlea = m_OrderTypeDistribution->nextRandom();
-  if(l_orderTypeAlea<m_cancelBuyFrequency) {
-    // std::cout << "CANCEL_BUY" << std::endl ;
+  double l_orderTypeAlea = orderTypeDistribution->nextRandom();
+  if(l_orderTypeAlea < cancelBuyFrequency) {
+    /* std::cout << "CANCEL_BUY" << std::endl; */
     return CANCEL_BUY;
   }
-  else if(l_orderTypeAlea<m_cancelBuyFrequency + m_cancelSellFrequency) {
-    // std::cout << "CANCEL_SELL" << std::endl ;
+  else if(l_orderTypeAlea<cancelBuyFrequency + cancelSellFrequency) {
+    /* std::cout << "CANCEL_SELL" << std::endl; */
     return CANCEL_SELL;
   }
-  else if(l_orderTypeAlea<m_cancelBuyFrequency + m_cancelSellFrequency + m_buyFrequency) {
-    // std::cout << "LIMIT_BUY" << std::endl ;
+  else if(l_orderTypeAlea < (cancelBuyFrequency + cancelSellFrequency + buyFrequency)) {
+    /* std::cout << "LIMIT_BUY" << std::endl; */
     return LIMIT_BUY ;
   }
   else {
-    // std::cout << "LIMIT_SELL " << std::endl ;
+    /* std::cout << "LIMIT_SELL " << std::endl; */
     return LIMIT_SELL ;
   }
 }
@@ -156,7 +156,7 @@ void LiquidityProvider::makeAction(int a_OrderBookId, double a_currentTime, bool
   //	std::cout<<"LIMIT order!!!"<<std::endl;
   //std::cout<<"LIQUIDITY ORDER"<<std::endl;
 
-  int tickSize = m_linkToMarket->getOrderBook(a_OrderBookId)->getTickSize();
+  int tickSize = linkToMarket->getOrderBook(a_OrderBookId)->getTickSize();
   int i;
   int end;
   if (init) {
@@ -168,10 +168,10 @@ void LiquidityProvider::makeAction(int a_OrderBookId, double a_currentTime, bool
     end = 19;
   }
 		
-  DistributionUniform *u = new DistributionUniform(m_linkToMarket->getRNG(), 0, 1);
-  for (i; i <= end; i++) {
+  DistributionUniform *u = new DistributionUniform(linkToMarket->getRNG(), 0, 1);
+  for (; i <= end; i++) {
     if( u->nextRandom() > 0.5) {
-      int currentPriceAsk = m_linkToMarket->getOrderBook(a_OrderBookId)->getAskPrice();
+      int currentPriceAsk = linkToMarket->getOrderBook(a_OrderBookId)->getAskPrice();
       //std::cout<<"current Ask : "<<currentPriceAsk<<std::endl;
       //std::cout<<"current Bid : "<<currentPriceBid<<std::endl;
 
@@ -182,7 +182,7 @@ void LiquidityProvider::makeAction(int a_OrderBookId, double a_currentTime, bool
 		  buyOrderVolume,
 		  LIMIT_BUY,
 		  buyPrice);
-      int currentPriceBid = m_linkToMarket->getOrderBook(a_OrderBookId)->getBidPrice();
+      int currentPriceBid = linkToMarket->getOrderBook(a_OrderBookId)->getBidPrice();
       int sellPrice = currentPriceBid+(i)*tickSize;
       int sellOrderVolume = getOrderVolume(sellPrice, a_OrderBookId, LIMIT_SELL);
       submitOrder(a_OrderBookId,
@@ -192,7 +192,7 @@ void LiquidityProvider::makeAction(int a_OrderBookId, double a_currentTime, bool
 		  sellPrice);
     }
     else {
-      int currentPriceBid = m_linkToMarket->getOrderBook(a_OrderBookId)->getBidPrice();
+      int currentPriceBid = linkToMarket->getOrderBook(a_OrderBookId)->getBidPrice();
       int sellPrice = currentPriceBid+(i)*tickSize;
       int sellOrderVolume = getOrderVolume(sellPrice, a_OrderBookId, LIMIT_SELL);
       submitOrder(a_OrderBookId,
@@ -200,9 +200,9 @@ void LiquidityProvider::makeAction(int a_OrderBookId, double a_currentTime, bool
 		  sellOrderVolume,
 		  LIMIT_SELL,
 		  sellPrice);
-      int currentPriceAsk = m_linkToMarket->getOrderBook(a_OrderBookId)->getAskPrice();
-      //std::cout<<"current Ask : "<<currentPriceAsk<<std::endl;
-      //std::cout<<"current Bid : "<<currentPriceBid<<std::endl;
+      int currentPriceAsk = linkToMarket->getOrderBook(a_OrderBookId)->getAskPrice();
+      /* std::cout<<"current Ask : "<<currentPriceAsk<<std::endl; */
+      /* std::cout<<"current Bid : "<<currentPriceBid<<std::endl; */
 
       int buyPrice = currentPriceAsk - (i) * tickSize;
       int buyOrderVolume = getOrderVolume(buyPrice, a_OrderBookId, LIMIT_BUY);
@@ -217,14 +217,14 @@ void LiquidityProvider::makeAction(int a_OrderBookId, double a_currentTime, bool
 }
 
 void LiquidityProvider::chooseOrdersToBeCanceled(int a_OrderBookId, bool a_buySide, double a_time) {
-  std::map<int,Order> pendingOrdersCopy(m_pendingOrders);
+  std::map<int,Order> pendingOrdersCopy(pendingOrders);
   std::map<int,Order>::iterator iter = pendingOrdersCopy.begin();
   
   while(iter != pendingOrdersCopy.end()) {
     OrderType thisOrderType = iter->second.getType();
     if((thisOrderType == LIMIT_BUY && a_buySide) || (thisOrderType == LIMIT_SELL && !a_buySide)) {
-      double cancelAlea = m_cancelDistribution->nextRandom();
-      if(cancelAlea < m_cancelProbability) {
+      double cancelAlea = cancelDistribution->nextRandom();
+      if(cancelAlea < cancelProbability) {
 	submitCancellation(a_OrderBookId, iter->second.getIdentifier(), a_time);
       }
     }
@@ -237,6 +237,6 @@ void LiquidityProvider::processInformation() {
 }
 
 void LiquidityProvider::cleanPending() {
-  m_pendingOrders.clear();
+  pendingOrders.clear();
 }
 

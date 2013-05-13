@@ -8,9 +8,16 @@
 #ifndef ORDER_H_
 #define ORDER_H_
 
+#include "Types.h"
+
 class Order {
 
 public:
+
+	friend class Agent;
+	friend class OrderBook;
+	friend class Market;
+
 	Order();
 	Order(int asset,
 		  int owner,
@@ -27,11 +34,14 @@ public:
 	int getInitialVolume() ;
 	int getPrice() ;
 	double getTime() ;
+	int getGlobalOrderIdentifier();
 	OrderType getType() ;
 	void printOrder() ;
 	void setPrice (int price) ;
 	void setVolume(int a_volume);
-	void setType(OrderType a_type) ;
+	void setType(OrderType a_type);
+	void setState(OrderState a_state);
+	std::vector<ExecutionHistory> getExecutionHistory();
 
 private:
 	int asset;

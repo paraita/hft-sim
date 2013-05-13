@@ -43,16 +43,16 @@ class LiquidityProvider : public Agent {
 
  private:
 		
-  double m_cancelBuyFrequency;
-  double m_cancelSellFrequency;
-  double m_buyFrequency ;
-  double m_sellFrequency;
-  double m_cancelProbability ;
-  DistributionUniform *m_cancelDistribution ;
-  Distribution *m_ActionTimeDistribution ;
-  Distribution *m_OrderVolumeDistribution ;
-  Distribution *m_OrderPriceDistribution ;
-  DistributionUniform *m_OrderTypeDistribution ;
+  double cancelBuyFrequency;
+  double cancelSellFrequency;
+  double buyFrequency ;
+  double sellFrequency;
+  double cancelProbability ;
+  DistributionUniform *cancelDistribution ;
+  Distribution *actionTimeDistribution ;
+  Distribution *orderVolumeDistribution ;
+  Distribution *orderPriceDistribution ;
+  DistributionUniform *orderTypeDistribution ;
 
 };
 

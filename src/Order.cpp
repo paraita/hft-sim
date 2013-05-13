@@ -1,7 +1,17 @@
 #include <iostream>
 #include "Order.h"
 
-Order::Order() { }
+Order::Order() {
+	asset = -1;
+	owner = -1;
+	time = 0.0;
+	price = -1;
+	initialVolume = -1;
+	volume = -1;
+	type = MARKET_SELL;
+	state = ALIVE;
+	globalOrderIdentifier = -1;
+}
 
 Order::Order(int a_asset,
 	     int a_owner,
@@ -10,66 +20,74 @@ Order::Order(int a_asset,
 	     int a_volume,
 	     OrderType a_type,
 	     int a_globalOrderIdentifier) {
-  m_asset = a_asset;
-  m_owner = a_owner;
-  m_time = a_time;
-  m_price = a_price;
-  m_initialVolume = a_volume;
-  m_volume = a_volume;
-  m_type = a_type;
-  m_state = ALIVE;
-  m_globalOrderIdentifier = a_globalOrderIdentifier;
+  asset = a_asset;
+  owner = a_owner;
+  time = a_time;
+  price = a_price;
+  initialVolume = a_volume;
+  volume = a_volume;
+  type = a_type;
+  state = ALIVE;
+  globalOrderIdentifier = a_globalOrderIdentifier;
 }
 
 Order::~Order() { }
 
+int Order::getGlobalOrderIdentifier() {
+	return globalOrderIdentifier;
+}
+
 int Order::getUnderlying() {
-  return m_asset;
+  return asset;
 }
 
 int Order::getIdentifier() {
-  return m_globalOrderIdentifier;
+  return globalOrderIdentifier;
 }
 
 int Order::getOwner() {
-  return m_owner;
+  return owner;
 }
 
 int Order::getVolume() {
-  return m_volume;
+  return volume;
 }
 
 int Order::getInitialVolume() {
-  return m_initialVolume;
+  return initialVolume;
 }
 
 int Order::getPrice() {
-  return m_price;
+  return price;
 }
 
 OrderType Order::getType() {
-  return m_type;
+  return type;
 }
 
 double Order::getTime() {
-  return m_time;
+  return time;
 }
 
 void Order::printOrder() {
-  std::cout << m_globalOrderIdentifier << "\t" << m_owner << "\t"	
-	    << m_asset << "\t" << m_type << "\t" << m_state << "\t"	
-	    << m_initialVolume << "\t" << m_volume << "\t" << m_price << "\t"	
+  std::cout << globalOrderIdentifier << "\t" << owner << "\t"
+	    << asset << "\t" << type << "\t" << state << "\t"
+	    << initialVolume << "\t" << volume << "\t" << price << "\t"
 	    << std::endl;	
 }
 
 void Order::setPrice(int a_price) {
-  m_price = a_price;
+  price = a_price;
 }
 
 void Order::setVolume(int a_volume) {
-  m_volume = a_volume;
+  volume = a_volume;
 }
 
 void Order::setType(OrderType a_type) {
-  m_type = a_type;
+  type = a_type;
+}
+
+void Order::setState(OrderState a_state) {
+	state = a_state;
 }

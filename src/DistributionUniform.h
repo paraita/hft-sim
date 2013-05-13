@@ -19,7 +19,7 @@ class DistributionUniform : public Distribution {
   ~DistributionUniform() { }
 
   double nextRandom() {
-    static boost::uniform_01<GeneratorType> unif01(m_rng->getRNG()); 
+    static boost::uniform_01<GeneratorType> unif01(m_rng->getRNG());
     //see http://www.bnikolic.co.uk/blog/cpp-boost-uniform01.html for the mystery of static
     return m_lowerBound+unif01()*(m_upperBound-m_lowerBound);
   }

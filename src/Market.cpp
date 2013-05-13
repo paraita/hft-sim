@@ -141,8 +141,8 @@ void Market::pushOrder(Order& a_order) {
 
 void Market::notifyExecution(int a_agentIdentifier, int a_orderIdentifier, double a_time, int a_price) {
   double l_fee = calculateMarketFees(a_price,
-				     m_agents[a_agentIdentifier]->m_passedOrders[a_orderIdentifier].m_volume,
-				     m_agents[a_agentIdentifier]->m_passedOrders[a_orderIdentifier].m_type,
+				     m_agents[a_agentIdentifier]->passedOrders[a_orderIdentifier].volume,
+				     m_agents[a_agentIdentifier]->passedOrders[a_orderIdentifier].type,
 				     a_agentIdentifier);
   
   m_agents[a_agentIdentifier]->chargeMarketFees(l_fee);
@@ -153,7 +153,7 @@ void Market::notifyExecution(int a_agentIdentifier, int a_orderIdentifier, doubl
 
 void Market::notifyPartialExecution(int a_agentIdentifier, int a_orderIdentifier, double a_time, int a_volume, int a_price) {
   double l_fee = calculateMarketFees(a_price,a_volume,
-				     m_agents[a_agentIdentifier]->m_passedOrders[a_orderIdentifier].m_type,
+				     m_agents[a_agentIdentifier]->passedOrders[a_orderIdentifier].type,
 				     a_agentIdentifier);
   
   m_agents[a_agentIdentifier]->chargeMarketFees(l_fee);
