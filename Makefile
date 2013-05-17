@@ -12,6 +12,7 @@ BOOST_LIB := -L/opt/local/lib -lboost_system-mt -lboost_filesystem-mt
 SRCDIR  := src
 BINDIR  := bin
 OBJDIR  := obj
+RESDIR  := res
 
 # compilers
 CC := clang++ -c
@@ -21,7 +22,7 @@ LINK := clang++
 EXECUTABLE := hftsim
 SRC := Exceptions.cpp Order.cpp OrderBook.cpp Agent.cpp \
 	   NewsServer.cpp Market.cpp LiquidityProvider.cpp \
-	   NoiseTrader.cpp MarketMaker.cpp Plot.cpp Stats.cpp main.cpp
+	   NoiseTrader.cpp MarketMaker.cpp Plot.cpp Stats.cpp Simulator.cpp
 OBJS := $(SRC:.cpp=.o)
 LOBJS := $(patsubst %.o,$(OBJDIR)/%.o,$(OBJS))
 
@@ -48,9 +49,10 @@ $(TARGET): makedirs $(OBJS)
 makedirs:
 	@mkdir -p $(OBJDIR)
 	@mkdir -p $(BINDIR)
+	@mkdir -p $(RESDIR)
 
 clean:
 	@echo "uoti, ma ro'a !"
-	-@rm -Rf $(OBJDIR) $(BINDIR)
+	-@rm -Rf $(OBJDIR) $(BINDIR) $(RESDIR) *.data
 
 .PHONY: clean mrproper check-syntax $(TARGET) $(BINDIR) $(SRCDIR) $(OBJDIR)
