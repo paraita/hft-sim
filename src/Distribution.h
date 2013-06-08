@@ -3,22 +3,24 @@
 
 #include "RandomNumberGenerator.h"
 
-class Distribution {
-
- public:
-
-  Distribution(RandomNumberGenerator *a_rng) {
-    m_rng = a_rng;
-  }
-
-  virtual ~Distribution() { }
-  
-  virtual double nextRandom() = 0 ;
+class Distribution 
+{
+	public:
+		Distribution(RandomNumberGenerator * a_rng)
+		{
+			m_rng = a_rng;
+		}
+		virtual ~Distribution()
+		{
 		
- protected:
-
-  RandomNumberGenerator *m_rng;
-
+		}
+		
+		virtual double nextRandom() = 0 ;
+		
+	protected:
+		RandomNumberGenerator * m_rng;
+	
 };
+
 
 #endif //__DISTRIBUTION__H__
