@@ -4,9 +4,9 @@
 #include <map>
 #include <vector>
 #include "Types.h"
-#include <concurrent_unordered_map.h>
+#include <tbb/concurrent_unordered_map.h>
 
-#include <boost\thread\mutex.hpp>
+#include <boost/thread/mutex.hpp>
 
 class Order;
 class Market;
@@ -160,23 +160,23 @@ class Agent
 		/*! \brief returns reference to map of pending orders
 		 * 
 		 */
-		concurrency::concurrent_unordered_map<int,Order> * getPendingOrders() ;
+		tbb::concurrent_unordered_map<int,Order> * getPendingOrders() ;
 
 		boost::mutex mtx_;
 
-		int Agent::nbPendingOrder();
+		int nbPendingOrder();
 	
 	protected:
 		int	m_identifier;
 		AgentType m_Type ;
 		Market * m_linkToMarket; // DO NOT DELETE, JUST A LINK
 
-		concurrency::concurrent_unordered_map<int,Order> m_passedOrders;
+		tbb::concurrent_unordered_map<int,Order> m_passedOrders;
 		
 		/*! \brief map of pending orders (i.e. orders which can be cancelled)
 		 * 
 		 */
-		concurrency::concurrent_unordered_map<int,Order> m_pendingOrders;
+		tbb::concurrent_unordered_map<int,Order> m_pendingOrders;
 		
 		int m_cashPosition;
 		

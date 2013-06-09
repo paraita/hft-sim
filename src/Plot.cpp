@@ -55,7 +55,7 @@ void Plot::plot(std::string dataName, int size, const double *x, const double *y
 
 }
 //-----------------------------------------------------------------------------
-void Plot::plotPrices( const concurrency::concurrent_vector<double> & x, const concurrency::concurrent_vector<int> & y){
+void Plot::plotPrices( const tbb::concurrent_vector<double> & x, const tbb::concurrent_vector<int> & y){
 	std::ofstream outFile("Prices.data");
 	for(unsigned int i=0;i<x.size();i++){
 			outFile<<x[i]<<'\t'<<y[i]/100.0<<'\n';	

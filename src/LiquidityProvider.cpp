@@ -204,8 +204,8 @@ void LiquidityProvider::makeBuyAction(int a_OrderBookId, double a_currentTime)
 void LiquidityProvider::chooseOrdersToBeCanceled(int a_OrderBookId, bool a_buySide, double a_time)
 {
 	mtx_.lock();
-	concurrency::concurrent_unordered_map<int,Order> pendingOrdersCopy(m_pendingOrders) ;
-	concurrency::concurrent_unordered_map<int,Order>::iterator iter = pendingOrdersCopy.begin();
+	tbb::concurrent_unordered_map<int,Order> pendingOrdersCopy(m_pendingOrders) ;
+	tbb::concurrent_unordered_map<int,Order>::iterator iter = pendingOrdersCopy.begin();
 	mtx_.unlock();
 
 	while(iter!=pendingOrdersCopy.end()){
@@ -238,8 +238,8 @@ void LiquidityProvider::processInformation()
 void LiquidityProvider::printPending()
 {
 	mtx_.lock();
-	concurrency::concurrent_unordered_map<int,Order> pendingOrdersCopy(m_pendingOrders) ;
-	concurrency::concurrent_unordered_map<int,Order>::iterator iter = pendingOrdersCopy.begin();
+	tbb::concurrent_unordered_map<int,Order> pendingOrdersCopy(m_pendingOrders) ;
+	tbb::concurrent_unordered_map<int,Order>::iterator iter = pendingOrdersCopy.begin();
 	mtx_.unlock();
 
 	while(iter!=pendingOrdersCopy.end()){

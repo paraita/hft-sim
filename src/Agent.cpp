@@ -60,7 +60,7 @@ void Agent::notifyExecution(int a_orderIdentifier,double a_time,int a_price)
 	l_order->m_state = EXECUTED;
 
 	// Remove from pending orders list
-	concurrency::concurrent_unordered_map<int,Order>::iterator iter;
+	tbb::concurrent_unordered_map<int,Order>::iterator iter;
 	mtx_.lock();
 	try{
 		iter = m_pendingOrders.find(a_orderIdentifier) ;
@@ -106,7 +106,7 @@ void Agent::notifyCancellation(int a_orderIdentifier,double a_time)
 
 	// Remove from pending orders list
 	mtx_.lock();
-	concurrency::concurrent_unordered_map<int,Order>::iterator iter = m_pendingOrders.find(a_orderIdentifier) ;
+	tbb::concurrent_unordered_map<int,Order>::iterator iter = m_pendingOrders.find(a_orderIdentifier) ;
 	if(iter==m_pendingOrders.end()){
 		std::cout << "a_orderIdentifier not found in Agent::notifyCancellation." << std::endl ;
 		exit(1) ;
@@ -197,7 +197,7 @@ double Agent::getFeeRate(OrderType a_orderType)
 {
 	return 0.0;
 }
-concurrency::concurrent_unordered_map<int,Order> * Agent::getPendingOrders()
+tbb::concurrent_unordered_map<int,Order> * Agent::getPendingOrders()
 {
 	return &m_pendingOrders;
 }

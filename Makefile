@@ -6,7 +6,8 @@
 
 # libs TODO modifier selon l'architecture
 BOOST_INC := -I/opt/local/include
-BOOST_LIB := -L/opt/local/lib -lboost_system-mt -lboost_filesystem-mt
+BOOST_LIB := -L/opt/local/lib -lboost_system-mt -lboost_filesystem-mt -lboost_thread-mt
+TBB_LIB   := -ltbb
 
 # arborescence
 SRCDIR  := src
@@ -44,7 +45,7 @@ arch-cible:
 	@echo "compilation on arch $(shell uname)"
 
 $(TARGET): makedirs $(OBJS)
-	$(LINKLINE) $(BOOST_INC) $(BOOST_LIB)
+	$(LINKLINE) $(BOOST_INC) $(BOOST_LIB) $(TBB_LIB)
 
 makedirs:
 	@mkdir -p $(OBJDIR)

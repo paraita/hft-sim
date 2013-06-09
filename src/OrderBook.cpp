@@ -540,11 +540,11 @@ void OrderBook::setDefaultBidAsk(int bid, int ask){
 	m_defaultAsk = ask;
 }
 
-concurrency::concurrent_vector<int> OrderBook::getHistoricPrices(){
+tbb::concurrent_vector<int> OrderBook::getHistoricPrices(){
 	return m_historicPrices;
 }
 
-concurrency::concurrent_vector<double> OrderBook::getTransactionsTimes(){
+tbb::concurrent_vector<double> OrderBook::getTransactionsTimes(){
 	return m_transactionsTimes;
 }
 
@@ -567,9 +567,9 @@ int OrderBook::getPrice() const
 
 void OrderBook::getOrderBookForPlot(std::vector<int> &a_price, std::vector<int> &a_priceQ, std::vector<int> &a_priceMM, std::vector<int> &a_priceQMM)
 {
-	concurrency::concurrent_unordered_map<int, int>::const_iterator itBids; 
-	concurrency::concurrent_unordered_map<int, int>::const_iterator itMM; 
-	concurrency::concurrent_unordered_map<int, int>::const_iterator it; 
+	tbb::concurrent_unordered_map<int, int>::const_iterator itBids;
+	tbb::concurrent_unordered_map<int, int>::const_iterator itMM;
+	tbb::concurrent_unordered_map<int, int>::const_iterator it;
 	std::vector<LimitOrders> l_vector;
 
 	for(itBids = quantity.begin();itBids != quantity.end();itBids++)

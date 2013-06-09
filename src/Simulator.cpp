@@ -2,8 +2,6 @@
 #include <iostream>
 #include <sstream>
 
-#include<windows.h>
-
 #include "Agent.h"
 #include "Market.h"
 #include "Order.h"
@@ -21,7 +19,7 @@
 
 
 
-#include <boost\thread.hpp>
+#include <boost/thread.hpp>
 #include "MarketMaker.h"
 
 
@@ -39,8 +37,8 @@ void plotOrderBook(Market *aMarket,Plot* aplotter,int a_orderBookId)
 	aMarket->getOrderBook(a_orderBookId)->getOrderBookForPlot(price,priceQ,priceMM,priceQMM);
 	last = aMarket->getOrderBook(a_orderBookId)->getPrice();
 
-	concurrency::concurrent_vector<int> historicPrices = aMarket->getOrderBook(a_orderBookId)->getHistoricPrices();
-	concurrency::concurrent_vector<double> transactionsTimes = aMarket->getOrderBook(a_orderBookId)->getTransactionsTimes();
+	tbb::concurrent_vector<int> historicPrices = aMarket->getOrderBook(a_orderBookId)->getHistoricPrices();
+	tbb::concurrent_vector<double> transactionsTimes = aMarket->getOrderBook(a_orderBookId)->getTransactionsTimes();
 
 	int sizePrices = historicPrices.size();
 	int sizeTransactionsTimes = transactionsTimes.size();
@@ -127,8 +125,8 @@ int main(int argc, char* argv[])
 {
 
 	Plot * plotter2 = new Plot() ;
-	concurrency::concurrent_vector<double> transactionsTimes;
-	concurrency::concurrent_vector<int> historicPrices ;
+	tbb::concurrent_vector<double> transactionsTimes;
+	tbb::concurrent_vector<int> historicPrices ;
 	Plot * plotter = new Plot() ;
 	double currentTime ;
 	int i ;
@@ -235,7 +233,7 @@ int main(int argc, char* argv[])
 			) ;
 		myMarket->registerAgent(myMarketMaker);
 
-		Sleep(200);
+		sleep(200);
 
 		// Simulate market
 		std::cout << "Simulation starts. " << std::endl ;
@@ -401,7 +399,7 @@ int main(int argc, char* argv[])
 	outFileCashMM.close();
 	outFileCashNT.close();
 	outFileNbOrdersMM.close();
-	std::cout << "ça marche" << std::endl;
+	std::cout << "ï¿½a marche" << std::endl;
 
 	return 0;
 }

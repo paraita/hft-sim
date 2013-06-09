@@ -178,8 +178,8 @@ void MarketMaker::makeAction(int a_OrderBookId, double a_currentTime)
 void MarketMaker::chooseOrdersToBeCanceled(int a_OrderBookId, bool a_buySide, double a_time)
 {
 	mtx_.lock();
-	concurrency::concurrent_unordered_map<int,Order> pendingOrdersCopy(m_pendingOrders) ;
-	concurrency::concurrent_unordered_map<int,Order>::iterator iter = pendingOrdersCopy.begin();
+	tbb::concurrent_unordered_map<int,Order> pendingOrdersCopy(m_pendingOrders) ;
+	tbb::concurrent_unordered_map<int,Order>::iterator iter = pendingOrdersCopy.begin();
 	mtx_.unlock();
 
 	while(iter!=pendingOrdersCopy.end()){
@@ -203,8 +203,8 @@ void MarketMaker::processInformation()
 
 void MarketMaker::cleanObsoletOrders(int orderBookID, double a_currentTime){
 	mtx_.lock();
-	concurrency::concurrent_unordered_map<int,Order> pendingOrdersCopy(m_pendingOrders) ;
-	concurrency::concurrent_unordered_map<int,Order>::iterator iter = pendingOrdersCopy.begin();
+	tbb::concurrent_unordered_map<int,Order> pendingOrdersCopy(m_pendingOrders) ;
+	tbb::concurrent_unordered_map<int,Order>::iterator iter = pendingOrdersCopy.begin();
 	mtx_.unlock();
 
 	while(iter!=pendingOrdersCopy.end()){

@@ -40,3 +40,6 @@ local.properties
 
 # PDT-specific
 .buildpath
+
+#---------- project related
+*.data

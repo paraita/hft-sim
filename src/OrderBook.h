@@ -4,11 +4,12 @@
 #include <map>
 #include <list>
 #include <cstdio>
+#include <cmath>
 
-#include <concurrent_queue.h>
-#include <concurrent_unordered_map.h>
-#include <concurrent_vector.h>
-#include <concurrent_priority_queue.h>
+#include <tbb/concurrent_queue.h>
+#include <tbb/concurrent_unordered_map.h>
+#include <tbb/concurrent_vector.h>
+#include <tbb/concurrent_priority_queue.h>
 
 #include "Order.h"
 #include "OrderPriority.h"
@@ -126,15 +127,15 @@ public:
 	/*! \brief prepares data to be plotted in Gnuplot
 	*
 	*/
-	void OrderBook::getOrderBookForPlot(std::vector<int> &a_price, std::vector<int> &a_priceQ, std::vector<int> &a_priceMM, std::vector<int> &a_priceQMM);
+	void getOrderBookForPlot(std::vector<int> &a_price, std::vector<int> &a_priceQ, std::vector<int> &a_priceMM, std::vector<int> &a_priceQMM);
 
 	/*! \brief returns the bid Queue
 	*
 	*/
 
-	concurrency::concurrent_vector<int> getHistoricPrices();
+	tbb::concurrent_vector<int> getHistoricPrices();
 
-	concurrency::concurrent_vector<double> getTransactionsTimes();
+	tbb::concurrent_vector<double> getTransactionsTimes();
 
 	double getReturnsSumSquared();
 
@@ -161,7 +162,7 @@ public:
 
 	void pushOrder(Order &order);
 
-	void OrderBook::closeOrderBook();
+	void closeOrderBook();
 
 	void quickSort(std::vector<int> &price, std::vector<int> &quantity, int left, int right);
 
@@ -234,15 +235,15 @@ private:
 	bool m_headerPrinted;
 
 	//contains the prices of the asset
-	concurrency::concurrent_vector <int> m_historicPrices;
+	tbb::concurrent_vector <int> m_historicPrices;
 	//contains the times of transactions (Market orders)
-	concurrency::concurrent_vector <double> m_transactionsTimes;
+	tbb::concurrent_vector <double> m_transactionsTimes;
 
 
-	concurrency::concurrent_priority_queue <Order, OrderPriority> orders;
-	concurrency::concurrent_unordered_map<int, int> quantity;
+	tbb::concurrent_priority_queue <Order, OrderPriority> orders;
+	tbb::concurrent_unordered_map<int, int> quantity;
 	// A map of map containing all prices and volumes for each agent. The first key is the agent ID and the second the price.
-	concurrency::concurrent_unordered_map<int, concurrency::concurrent_unordered_map<int, int>> agentsOrders;
+	tbb::concurrent_unordered_map<int, tbb::concurrent_unordered_map<int, int> > agentsOrders;
 	//concurrency::concurrent_unordered_map<int, int> asks_quantity;
 
 	long totalAskQuantity;
@@ -262,8 +263,8 @@ private:
 
 };
 template <typename K, typename V>
-V get_value_map(const  concurrency::concurrent_unordered_map <K,V> & m, const K & key, const V & defval ) {
-	typename concurrency::concurrent_unordered_map<K,V>::const_iterator it = m.find( key );
+V get_value_map(const  tbb::concurrent_unordered_map <K,V> & m, const K & key, const V & defval ) {
+	typename tbb::concurrent_unordered_map<K,V>::const_iterator it = m.find( key );
 	if ( it == m.end() ) {
 		return defval;
 	}
